@@ -92,11 +92,24 @@ jobs:
         run: |
           cd ios && pod install
 
+      # - name: Build app
+      #   run: yarn react-native bundle --entry-file index.js --platform ios --dev false --bundle-output ios/ios-app.jsbundle --assets-dest ios
+
+      # - name: Upload Artifact
+      #   uses: actions/upload-artifact@v1
+      #   with:
+      #     name: ios-app.jsbundle
+      #     path: ios/ios-app.jsbundle
+
+      # https://blog.usejournal.com/automate-react-native-builds-with-github-actions-af54212d26dc
       - name: Build app
-        run: yarn react-native bundle --entry-file index.js --platform ios --dev false --bundle-output ios/ios-app.jsbundle --assets-dest ios
+        run: |
+          xcodebuild -workspace github-actions-rn-poc.xcworkspace -scheme github-actions-rn-poc archive -archivePath github-actions-rn-poc.xcarchive -allowProvisioningUpdates
+          xcodebuild -exportArchive -archivePath ./github-actions-rn-poc.xcarchive -exportPath . -exportOptionsPlist github-actions-rn-poc/Info.plist
+          mv github-actions-rn-poc.ipa ../github-actions-rn-poc.ipa
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v1
         with:
-          name: ios-app.jsbundle
-          path: ios/ios-app.jsbundle
+          name: github-actions-rn-poc.ipa
+          path: ios/build/
